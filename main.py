@@ -31,7 +31,7 @@ def main():
     # Seed with WC 2018 + 2022 results on first run
     if not is_seeded():
         logger.info("No history found — seeding from past World Cups...")
-        seed(api_key)
+        seed()
 
     today = date.today()
     yesterday = today - timedelta(days=1)

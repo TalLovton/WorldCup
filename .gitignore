@@ -4,4 +4,4 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-data/history.db
+

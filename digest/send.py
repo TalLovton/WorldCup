@@ -65,6 +65,11 @@ def build_digest(
             lines.append(f"  Prediction : {home} win {_pct(pred['home_win'])}  |  "
                          f"Draw {_pct(pred['draw'])}  |  {away} win {_pct(pred['away_win'])}")
             lines.append(f"  Most likely score : {pred['most_likely_score']}")
+            score_probs = pred.get("score_probs", {})
+            if score_probs:
+                sorted_scores = sorted(score_probs.items(), key=lambda x: x[1], reverse=True)[:6]
+                prob_str = "  |  ".join(f"{s} ({p*100:.0f}%)" for s, p in sorted_scores)
+                lines.append(f"  Likely scorelines : {prob_str}")
             cs_h = _pct(pred.get("clean_sheet_home"))
             cs_a = _pct(pred.get("clean_sheet_away"))
             lines.append(f"  Clean sheet : {home} {cs_h}  |  {away} {cs_a}")

@@ -23,7 +23,7 @@ def main():
     from data.fetch import FootballDataClient, upsert_result, load_all_results
     from model.dixon_coles import fit, predict
     from news.summarize import fetch_news, get_discipline_notes
-    from email.send import build_digest, send_email
+    from digest.send import build_digest, send_email
 
     client = FootballDataClient(api_key)
 

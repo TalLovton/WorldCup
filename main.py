@@ -21,11 +21,17 @@ def main():
         sys.exit(1)
 
     from data.fetch import FootballDataClient, upsert_result, load_all_results
+    from data.seed import is_seeded, seed
     from model.dixon_coles import fit, predict
     from news.summarize import fetch_news, get_discipline_notes
     from digest.send import build_digest, send_email
 
     client = FootballDataClient(api_key)
+
+    # Seed with WC 2018 + 2022 results on first run
+    if not is_seeded():
+        logger.info("No history found — seeding from past World Cups...")
+        seed(api_key)
 
     today = date.today()
     yesterday = today - timedelta(days=1)

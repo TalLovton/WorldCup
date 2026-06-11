@@ -73,7 +73,7 @@ def fit(matches: list[dict]) -> dict:
 
 
 def predict(home: str, away: str, model_params: dict, max_goals: int = 8) -> dict:
-    if not model_params or home not in model_params.get("attack", {}):
+    if not model_params:
         return {
             "home_win": 1 / 3,
             "draw": 1 / 3,
@@ -90,8 +90,21 @@ def predict(home: str, away: str, model_params: dict, max_goals: int = 8) -> dic
     ha = model_params["home_adv"]
     rho = model_params["rho"]
 
-    mu_h = math.exp(atk[home] - dfc[away] + ha)
-    mu_a = math.exp(atk[away] - dfc[home])
+    avg_atk = sum(atk.values()) / len(atk)
+    avg_dfc = sum(dfc.values()) / len(dfc)
+
+    home_atk = atk.get(home, avg_atk)
+    home_dfc = dfc.get(home, avg_dfc)
+    away_atk = atk.get(away, avg_atk)
+    away_dfc = dfc.get(away, avg_dfc)
+
+    note = ""
+    unknown = [t for t in (home, away) if t not in atk]
+    if unknown:
+        note = f"No history for {', '.join(unknown)} — average ratings used."
+
+    mu_h = math.exp(home_atk - away_dfc + ha)
+    mu_a = math.exp(away_atk - home_dfc)
 
     score_matrix = np.zeros((max_goals + 1, max_goals + 1))
     for hg in range(max_goals + 1):
@@ -130,7 +143,7 @@ def predict(home: str, away: str, model_params: dict, max_goals: int = 8) -> dic
         "score_probs": score_probs,
         "clean_sheet_home": round(clean_sheet_home, 4),
         "clean_sheet_away": round(clean_sheet_away, 4),
-        "note": "",
+        "note": note,
     }
 
 

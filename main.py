@@ -78,12 +78,19 @@ def main():
         key = f"{home} vs {away}"
         predictions[key] = predict(home, away, model_params)
 
-    # 6. Scorers
+    # 6. Scorers & standings
     scorers = []
     try:
         scorers = client.get_scorers()
     except Exception as exc:
         logger.warning("Could not fetch scorers: %s", exc)
+
+    standings = []
+    try:
+        standings = client.get_standings()
+        logger.info("Fetched standings for %d group(s)", len(standings))
+    except Exception as exc:
+        logger.warning("Could not fetch standings: %s", exc)
 
     # 7. News
     tomorrow_teams = []
@@ -97,7 +104,7 @@ def main():
 
     # 9. Build and send
     subject, body = build_digest(
-        str(tomorrow), fixtures, predictions, scorers, news_lines, discipline_notes
+        str(tomorrow), fixtures, predictions, scorers, news_lines, discipline_notes, standings
     )
     send_email(subject, body)
     logger.info("Digest sent: %s", subject)

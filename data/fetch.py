@@ -73,7 +73,26 @@ class FootballDataClient:
 
     def get_standings(self) -> list[dict]:
         data = self._get(f"/competitions/{COMPETITION}/standings")
-        return data.get("standings", [])
+        groups = []
+        for standing in data.get("standings", []):
+            if standing.get("type") != "TOTAL":
+                continue
+            group_name = standing.get("group", "").replace("GROUP_", "Group ")
+            rows = []
+            for entry in standing.get("table", []):
+                rows.append({
+                    "team": entry["team"]["name"],
+                    "played": entry["playedGames"],
+                    "won": entry["won"],
+                    "drawn": entry["draw"],
+                    "lost": entry["lost"],
+                    "gf": entry["goalsFor"],
+                    "ga": entry["goalsAgainst"],
+                    "gd": entry["goalDifference"],
+                    "points": entry["points"],
+                })
+            groups.append({"group": group_name, "table": rows})
+        return groups
 
 
 def upsert_result(match: dict) -> None:
